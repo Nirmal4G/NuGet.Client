@@ -15,14 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet.Core.UnitTests", "NuG
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet.Core.FuncTests", "NuGet.Core.FuncTests", "{BB63CACA-866F-454F-BA4C-78B788D032BB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{DE23D071-162F-47A3-BC68-42E4A354835C}"
-	ProjectSection(SolutionItems) = preProject
-		Shared\EqualityUtility.cs = Shared\EqualityUtility.cs
-		Shared\HashCodeCombiner.cs = Shared\HashCodeCombiner.cs
-		Shared\TypeExtensions.cs = Shared\TypeExtensions.cs
-		Shared\TypeInfo.cs = Shared\TypeInfo.cs
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{D1549653-9631-4E16-9967-55427174A0DC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet.Client.UnitTests", "NuGet.Client.UnitTests", "{01BC4531-1E25-48D7-A8FD-A47D6FEC47FB}"
@@ -235,11 +227,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Packaging.Core", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Tools.Test", "test\NuGet.Clients.Tests\NuGet.Tools.Test\NuGet.Tools.Test.csproj", "{437C6B7E-B625-4AE5-A4CE-F2B3747FE1CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Msbuild.Integration.Test", "test\NuGet.Core.FuncTests\Msbuild.Integration.Test\Msbuild.Integration.Test.csproj", "{92EF44DB-4F40-4610-A1AD-3A554A0CA8B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Msbuild.Integration.Test", "test\NuGet.Core.FuncTests\Msbuild.Integration.Test\Msbuild.Integration.Test.csproj", "{92EF44DB-4F40-4610-A1AD-3A554A0CA8B9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Build.Tasks.Console", "src\NuGet.Core\NuGet.Build.Tasks.Console\NuGet.Build.Tasks.Console.csproj", "{3ED13630-90EB-420E-8083-0959B2955C6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGet.Build.Tasks.Console.Test", "test\NuGet.Core.Tests\NuGet.Build.Tasks.Console.Test\NuGet.Build.Tasks.Console.Test.csproj", "{2011B5A4-2184-4F94-9897-E5BC2425DCDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NuGet.Build.Tasks.Console.Test", "test\NuGet.Core.Tests\NuGet.Build.Tasks.Console.Test\NuGet.Build.Tasks.Console.Test.csproj", "{2011B5A4-2184-4F94-9897-E5BC2425DCDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,7 @@ $Nupkgs = Join-Path $Artifacts nupkgs
 $ConfigureJson = Join-Path $Artifacts configure.json
 $BuiltInVsWhereExe = "${Env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 $VSVersion = $env:VisualStudioVersion
-$DotNetExe = Join-Path $CLIRoot 'dotnet.exe'
+$DotNetExe = & where.exe dotnet.exe # "${Env:ProgramFiles}\dotnet\dotnet.exe"
 $XunitConsole = Join-Path $NuGetClientRoot 'packages\xunit.runner.console\2.1.0\tools\xunit.console.exe'
 $ILMerge = Join-Path $NuGetClientRoot 'packages\ilmerge\2.14.1208\tools\ILMerge.exe'
 
@@ -86,11 +86,11 @@ Function Invoke-BuildStep {
     [CmdletBinding()]
     [Alias('ibs')]
     param(
-        [Parameter(Mandatory=$True)]
+        [Parameter(Mandatory = $True)]
         [string]$BuildStep,
-        [Parameter(Mandatory=$True)]
+        [Parameter(Mandatory = $True)]
         [ScriptBlock]$Expression,
-        [Parameter(Mandatory=$False)]
+        [Parameter(Mandatory = $False)]
         [Alias('args')]
         [Object[]]$Arguments,
         [Alias('skip')]
@@ -172,32 +172,25 @@ Function Install-DotnetCLI {
     $CliBranchForTesting = & $msbuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting
 
     $cli = @{
-        Root = $CLIRoot
+        Root    = $CLIRoot
         Version = 'latest'
         Channel = $CliBranchForTesting.Trim()
-    }
-    
-    $DotNetExe = Join-Path $cli.Root 'dotnet.exe';
-
-    if ([Environment]::Is64BitOperatingSystem) {
-        $arch = "x64";
-    }
-    else {
-        $arch = "x86";
+        Architecture = if ([Environment]::Is64BitOperatingSystem) {"x64"} else {"x86"}
     }
 
-    $env:DOTNET_HOME=$cli.Root
-    $env:DOTNET_INSTALL_DIR=$NuGetClientRoot
+    $env:DOTNET_HOME = $cli.Root
+    $env:DOTNET_INSTALL_DIR = $NuGetClientRoot
+    $DotNetExe = Join-Path $cli.Root 'dotnet.exe'
     $DotNetInstall = Join-Path $cli.Root 'dotnet-install.ps1'
 
     if ($Force -or -not (Test-Path $DotNetExe)) {
         Trace-Log 'Downloading .NET CLI'
 
         New-Item -ItemType Directory -Force -Path $cli.Root | Out-Null
-
         Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile $DotNetInstall
-        Trace-Log "$DotNetInstall -Channel $($cli.Channel) -i $($cli.Root) -Version $($cli.Version) -Architecture $arch"
-        & $DotNetInstall -Channel $cli.Channel -i $cli.Root -Version $cli.Version -Architecture $arch
+
+        Trace-Log "$DotNetInstall -Channel $($cli.Channel) -i $($cli.Root) -Version $($cli.Version) -Architecture $cli.Architecture"
+        & $DotNetInstall -Channel $cli.Channel -i $cli.Root -Version $cli.Version -Architecture $cli.Architecture
     }
 
     if (-not (Test-Path $DotNetExe)) {
@@ -205,10 +198,11 @@ Function Install-DotnetCLI {
     }
 
     # Install the 2.x runtime because our tests target netcoreapp2x
-    Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.2 -i $CLIRoot -NoPath"
-    & $DotNetInstall -Runtime dotnet -Channel 2.2 -i $CLIRoot -NoPath
+    Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.2 -i $cli.Root -NoPath"
+    & $DotNetInstall -Runtime dotnet -Channel 2.2 -i $cli.Root -NoPath
     # Display build info
     & $DotNetExe --info
+    Set-Alias dotnet $DotNetExe
 }
 
 Function Get-LatestVisualStudioRoot {
@@ -222,7 +216,7 @@ Function Get-LatestVisualStudioRoot {
         $script:FallbackVSVersion = "$majorVersion.0"
 
         return $installationPath
-    } 
+    }
 
     Error-Log "Could not find a compatible Visual Studio Version because $BuiltInVsWhereExe does not exist" -Fatal
 }
@@ -235,7 +229,7 @@ otherwise we pick the latest Visual Studio version available on the machine.
 #>
 Function Get-VSVersion() {
     if (-not $VSVersion) {
-        if(-not $script:FallbackVSVersion){
+        if (-not $script:FallbackVSVersion) {
             Verbose-Log "No fallback VS Version set yet. This means that we are running outside of a developer command prompt scope."
             $_ = Get-LatestVisualStudioRoot
         }
@@ -257,7 +251,7 @@ Function Get-MSBuildExe {
         [string]$MSBuildVersion
     )
 
-    if(-not $MSBuildVersion){
+    if (-not $MSBuildVersion) {
         $MSBuildVersion = Get-VSMajorVersion
     }
 
@@ -265,7 +259,8 @@ Function Get-MSBuildExe {
     if (Test-Path $CommonToolsVar) {
         $CommonToolsValue = gci $CommonToolsVar | select -expand value -ea Ignore
         $MSBuildRoot = Join-Path $CommonToolsValue '..\..\MSBuild' -Resolve
-    } else {
+    }
+    else {
         $VisualStudioRoot = Get-LatestVisualStudioRoot
         if ($VisualStudioRoot -and (Test-Path $VisualStudioRoot)) {
             $MSBuildRoot = Join-Path $VisualStudioRoot 'MSBuild'
@@ -281,7 +276,8 @@ Function Get-MSBuildExe {
     if (Test-Path $MSBuildExe) {
         Verbose-Log "Found MSBuild.exe at `"$MSBuildExe`""
         $MSBuildExe
-    } else {
+    }
+    else {
         Error-Log 'Could not find MSBuild.exe' -Fatal
     }
 }
@@ -310,9 +306,9 @@ Function Test-BuildEnvironment {
     $script:VSToolsetInstalled = ($BuildToolsets | where vstoolset -ne $null)
 
     $ConfigureObject |
-         select -expand envvars -ea Ignore |
-         %{ $_.psobject.properties } |
-         %{ Set-Item -Path "env:$($_.Name)" -Value $_.Value }
+    select -expand envvars -ea Ignore |
+    % { $_.psobject.properties } |
+    % { Set-Item -Path "env:$($_.Name)" -Value $_.Value }
 
     if ($CI) {
         # Explicitly add cli to environment PATH
@@ -339,7 +335,7 @@ Function Clear-PackageCache {
 Function Clear-Artifacts {
     [CmdletBinding()]
     param()
-    if( Test-Path $Artifacts) {
+    if ( Test-Path $Artifacts) {
         Trace-Log 'Cleaning the Artifacts folder'
         Remove-Item $Artifacts\* -Recurse -Force -Exclude 'configure.json'
     }
@@ -354,7 +350,7 @@ Function Clear-Nupkgs {
     }
 }
 
-Function Restore-SolutionPackages{
+Function Restore-SolutionPackages {
     [CmdletBinding()]
     param(
     )
