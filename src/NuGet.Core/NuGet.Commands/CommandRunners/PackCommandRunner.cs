@@ -794,7 +794,8 @@ namespace NuGet.Commands
                 }
                 else
                 {
-                    successful = BuildPackage(mainPackageBuilder, symbolsPackage: false);
+                    string outputPath = GetOutputPath(mainPackageBuilder, _packArgs, outputDirectory: _packArgs.PackTargetArgs.PackageOutputPath);
+                    successful = BuildPackage(mainPackageBuilder, outputPath, symbolsPackage: false);
                 }
 
                 // If we're excluding symbols then do nothing else
