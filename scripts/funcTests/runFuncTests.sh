@@ -28,24 +28,22 @@ mono --version
 # Download the CLI install script to cli
 echo "Installing dotnet CLI"
 mkdir -p cli
-# Issue 8936 - DISABLED TEMPORARILY curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
+curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 
 # Run install.sh
-# Issue 8936 chmod +x cli/dotnet-install.sh
-chmod +x scripts/funcTests/dotnet-install.sh
+chmod +x cli/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
-# Issue 8936 - DISABLED TEMPORARILY cli/dotnet-install.sh -i cli -c 2.2
-scripts/funcTests/dotnet-install.sh -i cli -c 2.2 -NoPath
+cli/dotnet-install.sh -i cli -c 2.2 -NoPath
 
 DOTNET="$(pwd)/cli/dotnet"
 
 
-echo "dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting"
+echo "dotnet msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting"
 # run it twice so dotnet cli can expand and decompress without affecting the result of the target
-dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting
-DOTNET_BRANCHES="$(dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting)"
-echo $DOTNET_BRANCHES | tr ";" "\n" |  while read -r DOTNET_BRANCH
+dotnet msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting
+DOTNET_BRANCHES="$(dotnet msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting)"
+echo $DOTNET_BRANCHES | tr ";" "\n" | while read -r DOTNET_BRANCH
 do
 	echo $DOTNET_BRANCH
 	ChannelAndVersion=($DOTNET_BRANCH)

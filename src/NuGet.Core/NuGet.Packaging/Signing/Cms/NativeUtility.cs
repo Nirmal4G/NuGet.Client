@@ -3,6 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+
 #if IS_SIGNING_SUPPORTED
 using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
@@ -120,7 +121,9 @@ namespace NuGet.Packaging.Signing
 
             signerInfo.cbSize = (uint)Marshal.SizeOf(signerInfo);
             signerInfo.pCertInfo = MarshalUtility.PtrToStructure<CERT_CONTEXT>(cmsSigner.Certificate.Handle).pCertInfo;
+#pragma warning disable CA1416
             signerInfo.hCryptProvOrhNCryptKey = privateKey.Handle.DangerousGetHandle();
+#pragma warning restore CA1416
             signerInfo.HashAlgorithm.pszObjId = cmsSigner.DigestAlgorithm.Value;
 
             if (cmsSigner.SignerIdentifierType == SubjectIdentifierType.SubjectKeyIdentifier)

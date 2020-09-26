@@ -15,19 +15,29 @@ echo "Installing dotnet CLI"
 mkdir -p cli
 curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 
+if [ $? -ne 0 ]; then
+	echo "Could not download 'dotnet-install.sh' script. Please check your network and try again!"
+	exit 1
+fi
+
 # Run install.sh for cli
 chmod +x cli/dotnet-install.sh
 
 # v1 needed for some test and bootstrapping testing version
 cli/dotnet-install.sh -i cli -c 1.0
 
+if [ $? -ne 0 ]; then
+	echo ".NET CLI Install failed!!"
+	exit 1
+fi
+
 DOTNET="$(pwd)/cli/dotnet"
 
-echo "$DOTNET msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting"
+echo "$DOTNET msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting"
 
 # run it twice so dotnet cli can expand and decompress without affecting the result of the target
-$DOTNET msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting
-DOTNET_BRANCH="$($DOTNET msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting)"
+$DOTNET msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting
+DOTNET_BRANCH="$($DOTNET msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting)"
 
 echo $DOTNET_BRANCH
 cli/dotnet-install.sh -i cli -c $DOTNET_BRANCH
@@ -54,6 +64,7 @@ fi
 # restore packages
 echo "$DOTNET msbuild build/build.proj /t:Restore /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
 $DOTNET msbuild build/build.proj /t:Restore /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta
+
 if [ $? -ne 0 ]; then
 	echo "Restore failed!!"
 	exit 1

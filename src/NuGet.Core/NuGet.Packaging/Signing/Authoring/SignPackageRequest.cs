@@ -5,6 +5,10 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using NuGet.Common;
 
+#if IS_SIGNING_SUPPORTED
+using CngKey = System.Security.Cryptography.CngKey;
+#endif
+
 namespace NuGet.Packaging.Signing
 {
     /// <summary>
@@ -45,7 +49,7 @@ namespace NuGet.Packaging.Signing
         /// <summary>
         /// PrivateKey is only used in mssign command.
         /// </summary>
-        public System.Security.Cryptography.CngKey PrivateKey { get; set; }
+        public CngKey PrivateKey { get; set; }
 #endif
 
         protected SignPackageRequest(
@@ -87,7 +91,9 @@ namespace NuGet.Packaging.Signing
                 Chain?.Dispose();
 
 #if IS_SIGNING_SUPPORTED
+#pragma warning disable CA1416
                 PrivateKey?.Dispose();
+#pragma warning restore CA1416
 #endif
 
                 GC.SuppressFinalize(this);

@@ -157,95 +157,81 @@ Function Install-DotnetCLI {
     param(
         [switch]$Force
     )
-    $vsMajorVersion = Get-VSMajorVersion
-    $MSBuildExe = Get-MSBuildExe $vsMajorVersion
-    $CliBranchListForTesting = & $msbuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting
-    $CliBranchList = $CliBranchListForTesting.Split(';');
+    $env:DOTNET_HOME = $CLIRoot
+    $env:DOTNET_INSTALL_DIR = $NuGetClientRoot
 
+    Trace-Log "The .NET SDK will be installed in : $CLIRoot"
+
+    $VSVersion = Get-VSMajorVersion
+    $MSBuildExe = Get-MSBuildExe $VSVersion
+    $DotNetExe = Join-Path $CLIRoot 'dotnet.exe'
     $DotNetInstall = Join-Path $CLIRoot 'dotnet-install.ps1'
 
-    #If "-force" is specified, or dotnet.exe under cli folder doesn't exist, create cli folder and download dotnet-install.ps1 into cli folder.
+    # If "-force" is specified, or dotnet.exe under cli folder doesn't exist, create cli folder and download dotnet-install.ps1 into cli folder.
     if ($Force -or -not (Test-Path $DotNetExe)) {
-        Trace-Log "Downloading .NET CLI $CliBranchForTesting"
-
+        Trace-Log "Downloading .NET SDK Install Script"
         New-Item -ItemType Directory -Force -Path $CLIRoot | Out-Null
-
         Invoke-WebRequest 'https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.ps1' -OutFile $DotNetInstall
     }
 
-    ForEach ($CliBranch in $CliBranchList) {
-        $CliBranch = $CliBranch.trim()
-        $CliChannelAndVersion = $CliBranch -split "\s+"
+    $CliBranchListForTesting = & $msbuildExe $NuGetClientRoot\build\config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting
+    $CliBranchList = $CliBranchListForTesting.Trim() -split ';'
 
-        $Channel = $CliChannelAndVersion[0].trim()
-        if ($CliChannelAndVersion.count -eq 1) {
+    ForEach ($CliBranch in $CliBranchList) {
+        $CliChannel = $CliBranch.Trim() -split ":"
+
+        $Channel = $CliChannel[0].Trim()
+        if ($CliChannel.Count -eq 1) {
             $Version = 'latest'
         }
         else {
-            $Version = $CliChannelAndVersion[1].trim()
+            $Version = $CliChannel[1].Trim()
         }
 
-        $cli = @{
-            Root    = $CLIRoot
-            Version = $Version
-            Channel = $Channel
-        }
-
-        $DotNetExe = Join-Path $cli.Root 'dotnet.exe';
-
-        if ([Environment]::Is64BitOperatingSystem) {
-            $arch = "x64";
-        }
-        else {
-            $arch = "x86";
-        }
-
-        $env:DOTNET_HOME = $cli.Root
-        $env:DOTNET_INSTALL_DIR = $NuGetClientRoot
+        Trace-Log  "Channel: $Channel       Version: $Version"
 
         if ($Version -eq 'latest') {
-            #Get the latest specific version number for a certain channel from url like : https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/3.0.1xx/latest.version"
-            $httpGetUrl = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/" + $Channel + "/latest.version"
+            # Get the latest specific version number for a certain channel from url like : https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/3.1.1xx/latest.version"
+            $httpGetUrl = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$Channel/latest.version"
             $versionFile = Invoke-RestMethod -Method Get -Uri $httpGetUrl
 
-            $stringReader = New-Object -TypeName System.IO.StringReader -ArgumentList $versionFile
+            $reader = [System.IO.StringReader]::new($versionFile)
             [int]$count = 0
-            while ( $line = $stringReader.ReadLine() ) {
+            while ($line = $reader.ReadLine()) {
                 if ($count -eq 1) {
-                    $specificVersion = $line.trim()
+                    $SpecificVersion = $line.Trim()
                 }
                 $count += 1
             }
         }
         else {
-            $specificVersion = $Version
+            $SpecificVersion = $Version
         }
 
-        Trace-Log "The version of SDK should be installed is : $specificVersion"
+        Trace-Log "The version of SDK should be installed is : $SpecificVersion"
+        $SdkPath = Join-Path $CLIRoot "sdk\$SpecificVersion"
+        Trace-Log "Probing folder : $SdkPath"
 
-        $probeDotnetPath = Join-Path (Join-Path $cli.Root sdk)  $specificVersion
-
-        Trace-Log "Probing folder : $probeDotnetPath"
-
-        #If "-force" is specified, or folder with specific version doesn't exist, the download command will run"
-        if ($Force -or -not (Test-Path $probeDotnetPath)) {
-            & $DotNetInstall -Channel $cli.Channel -i $cli.Root -Version $cli.Version -Architecture $arch -NoPath
+        # If "-force" is specified, or folder with specific version doesn't exist, the download command will run
+        if ($Force -or -not (Test-Path $SdkPath)) {
+            # Install the latest .NET SDK from the specified channel/version
+            Trace-Log "$DotNetInstall -Channel $Channel -Version $Version -NoPath"
+            & $DotNetInstall -i $CLIRoot -Channel $Channel -Version $Version -NoPath
         }
 
-        if (-not (Test-Path $DotNetExe)) {
-            Error-Log "Unable to find dotnet.exe. The CLI install may have failed." -Fatal
-        }
-        if (-not(Test-Path $probeDotnetPath)) {
+        if (-not (Test-Path $SdkPath)) {
             Error-Log "Unable to find specific version of sdk. The CLI install may have failed." -Fatal
         }
-
-        # Display build info
-        & $DotNetExe --info
     }
 
-    # Install the 2.x runtime because our tests target netcoreapp2x
-    Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.2 -i $CLIRoot -NoPath"
-    & $DotNetInstall -Runtime dotnet -Channel 2.2 -i $CLIRoot -NoPath
+    # Install the 2.2 runtime because our tests uses it
+    Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.2 -NoPath"
+    & $DotNetInstall -i $CLIRoot -Runtime dotnet -Channel 2.2 -NoPath
+
+    if (-not (Test-Path $DotNetExe)) {
+        Error-Log "Unable to find dotnet.exe. The CLI install may have failed." -Fatal
+    }
+
     # Display build info
     & $DotNetExe --info
 }
