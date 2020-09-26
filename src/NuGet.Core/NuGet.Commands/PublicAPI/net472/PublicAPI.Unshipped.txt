@@ -1,1 +1,3 @@
 static NuGet.Commands.PushRunner.Run(NuGet.Configuration.ISettings settings, NuGet.Configuration.IPackageSourceProvider sourceProvider, System.Collections.Generic.IList<string> packagePaths, string source, string apiKey, string symbolSource, string symbolApiKey, int timeoutSeconds, bool disableBuffering, bool noSymbols, bool noServiceEndpoint, bool skipDuplicate, NuGet.Common.ILogger logger) -> System.Threading.Tasks.Task
+NuGet.Commands.MSBuildPackTargetArgs.PackageOutputPath.get -> string
+NuGet.Commands.MSBuildPackTargetArgs.PackageOutputPath.set -> void
