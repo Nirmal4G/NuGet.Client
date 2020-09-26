@@ -30,7 +30,8 @@ namespace NuGet.Commands
         }
 
         /// <summary>
-        /// The cache file path is $(MSBuildProjectExtensionsPath)\$(project).nuget.cache
+        /// The cache file path will be $(RestoreOutputPath)\$(project).nuget.cache
+        /// or $(MSBuildProjectExtensionsPath)\$(project).nuget.cache depending on the Project Style.
         /// </summary>
         private static string GetBuildIntegratedProjectCacheFilePath(RestoreRequest request)
         {
@@ -226,7 +227,7 @@ namespace NuGet.Commands
                     request.Project.TargetFrameworks.First().Dependencies.First().LibraryRange.VersionRange,
                     request.Project.TargetFrameworks.SingleOrDefault().FrameworkName);
 
-                if (toolDirectory != null) // Only set the paths if a good enough match was found. 
+                if (toolDirectory != null) // Only set the paths if a good enough match was found.
                 {
                     request.Project.RestoreMetadata.CacheFilePath = GetToolCacheFilePath(toolDirectory, ToolRestoreUtility.GetToolIdOrNullFromSpec(request.Project));
                     request.LockFilePath = toolPathResolver.GetLockFilePath(toolDirectory);
@@ -257,7 +258,7 @@ namespace NuGet.Commands
             {
                 foreach (var downloadDependency in targetFrameworkInformation.DownloadDependencies)
                 {
-                    //TODO: https://github.com/NuGet/Home/issues/7709 - only exact versions are currently supported. The check needs to be updated when version ranges are implemented. 
+                    //TODO: https://github.com/NuGet/Home/issues/7709 - only exact versions are currently supported. The check needs to be updated when version ranges are implemented.
                     packageFiles.AddRange(GetPackageFiles(request.DependencyProviders.PackageFileCache, downloadDependency.Name, downloadDependency.VersionRange.MinVersion, pathResolvers));
                 }
             }

@@ -664,7 +664,7 @@ namespace NuGet.Commands
             if (_packArgs.InstallPackageToOutputPath)
             {
                 string outputPath = GetOutputPath(packageBuilder, _packArgs);
-                successful = BuildPackage(packageBuilder, outputPath: outputPath, symbolsPackage: false);
+                successful = BuildPackage(packageBuilder, outputPath, symbolsPackage: false);
             }
             else
             {
@@ -790,7 +790,7 @@ namespace NuGet.Commands
                 if (_packArgs.InstallPackageToOutputPath)
                 {
                     string outputPath = GetOutputPath(mainPackageBuilder, _packArgs);
-                    successful = BuildPackage(mainPackageBuilder, outputPath: outputPath, symbolsPackage: false);
+                    successful = BuildPackage(mainPackageBuilder, outputPath, symbolsPackage: false);
                 }
                 else
                 {
@@ -993,7 +993,7 @@ namespace NuGet.Commands
         private bool BuildSymbolsPackage(string path)
         {
             PackageBuilder symbolsBuilder = CreatePackageBuilderFromNuspec(path);
-            if (_packArgs.SymbolPackageFormat == SymbolPackageFormat.Snupkg) // Snupkgs can only have 1 PackageType. 
+            if (_packArgs.SymbolPackageFormat == SymbolPackageFormat.Snupkg) // Snupkgs can only have 1 PackageType.
             {
                 symbolsBuilder.PackageTypes.Clear();
                 symbolsBuilder.PackageTypes.Add(PackageType.SymbolsPackage);
