@@ -40,10 +40,23 @@ $DOTNET --version
 # Get CLI Branches for testing
 echo "dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting"
 
-DOTNET_BRANCH="$($DOTNET msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting)"
+IFS=$'\n'
+CMD_OUT_LINES=(`$DOTNET msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting`)
+# Take the line just before the last empty line and remove all the spaces
+DOTNET_BRANCHES=${CMD_OUT_LINES[-1]//[[:space:]]}
+unset IFS
+
+IFS=$';'
+DOTNET_BRANCHES=(`echo ${CMD_OUT_LINES[-1]}`)
+DOTNET_BRANCH=(${DOTNET_BRANCHES[0]})
+unset IFS
+
+IFS=$':'
+Channel=${DOTNET_BRANCH[0]}
+unset IFS
 
 echo $DOTNET_BRANCH
-cli/dotnet-install.sh -i cli -c $DOTNET_BRANCH
+cli/dotnet-install.sh -i cli -c $Channel
 
 # Display current version
 $DOTNET --version

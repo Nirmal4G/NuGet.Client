@@ -51,11 +51,18 @@ echo "================="
 # Get CLI Branches for testing
 echo "dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting"
 
-DOTNET_BRANCHES="$(dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting)"
+IFS=$'\n'
+CMD_OUT_LINES=(`dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting`)
+# Take the line just before the last empty line and remove all the spaces
+DOTNET_BRANCHES=${CMD_OUT_LINES[-1]//[[:space:]]}
+unset IFS
 
-echo $DOTNET_BRANCHES | tr ";" "\n" | while read -r DOTNET_BRANCH
+IFS=$';'
+for DOTNET_BRANCH in ${DOTNET_BRANCHES[@]}
 do
 	echo $DOTNET_BRANCH
+
+	IFS=$':'
 	ChannelAndVersion=($DOTNET_BRANCH)
 	Channel=${ChannelAndVersion[0]}
 	if [ ${#ChannelAndVersion[@]} -eq 1 ]
@@ -64,6 +71,8 @@ do
 	else
 		Version=${ChannelAndVersion[1]}
 	fi
+	unset IFS
+
 	echo "Channel is: $Channel"
 	echo "Version is: $Version"
 	scripts/funcTests/dotnet-install.sh -i cli -c $Channel -v $Version -nopath

@@ -167,14 +167,15 @@ Function Install-DotnetCLI {
         Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -UseBasicParsing -OutFile $DotNetInstall
     }
 
-    $CliBranchListForTesting = & $MSBuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting
+    $CmdOutLines = ((& $MSBuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting) | Out-String).Trim()
+    $CliBranchListForTesting = ($CmdOutLines -split [Environment]::NewLine)[-1]
     $CliBranchList = $CliBranchListForTesting.Trim() -split ';'
 
     Trace-Log "Install .NET SDK for '$CliBranchList'"
 
     ForEach ($CliBranch in $CliBranchList) {
         $CliBranch = $CliBranch.Trim()
-        $CliChannelAndVersion = $CliBranch -split "\s+"
+        $CliChannelAndVersion = $CliBranch -split ":"
 
         $Channel = $CliChannelAndVersion[0].Trim()
         if ($CliChannelAndVersion.Count -eq 1) {
