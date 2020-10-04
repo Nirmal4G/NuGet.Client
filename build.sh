@@ -24,7 +24,7 @@ fi
 chmod +x cli/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
-cli/dotnet-install.sh -i cli -c 1.0
+cli/dotnet-install.sh -i cli -c 2.2
 
 if [ $? -ne 0 ]; then
 	echo ".NET CLI Install failed!!"
@@ -47,16 +47,29 @@ DOTNET_BRANCHES=${CMD_OUT_LINES[-1]//[[:space:]]}
 unset IFS
 
 IFS=$';'
-DOTNET_BRANCHES=(`echo ${CMD_OUT_LINES[-1]}`)
-DOTNET_BRANCH=(${DOTNET_BRANCHES[0]})
-unset IFS
+for DOTNET_BRANCH in ${DOTNET_BRANCHES[@]}
+do
+	echo $DOTNET_BRANCH
 
-IFS=$':'
-Channel=${DOTNET_BRANCH[0]}
-unset IFS
+	IFS=$':'
+	ChannelAndVersion=($DOTNET_BRANCH)
+	Channel=${ChannelAndVersion[0]}
+	if [ ${#ChannelAndVersion[@]} -eq 1 ]
+	then
+		Version="latest"
+	else
+		Version=${ChannelAndVersion[1]}
+	fi
+	unset IFS
 
-echo $DOTNET_BRANCH
-cli/dotnet-install.sh -i cli -c $Channel
+	echo "Channel is: $Channel"
+	echo "Version is: $Version"
+	cli/dotnet-install.sh -i cli -c $Channel -v $Version -nopath
+
+	if [ $? -ne 0 ]; then
+		echo ".NET CLI Install for '$DOTNET_BRANCH' failed!!"
+	fi
+done
 
 # Display current version
 $DOTNET --version
