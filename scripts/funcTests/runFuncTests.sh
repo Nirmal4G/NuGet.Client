@@ -37,16 +37,19 @@ chmod +x scripts/funcTests/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
 # Issue 8936 - DISABLED TEMPORARILY cli/dotnet-install.sh -i cli -c 2.2
-scripts/funcTests/dotnet-install.sh -i cli -c 2.2 -NoPath
+scripts/funcTests/dotnet-install.sh -i cli -c 2.2
 
-DOTNET="$(pwd)/cli/dotnet"
+# Check where the dotnet is run from
+which dotnet
+
+# Let the dotnet cli expand and decompress first if it's a first-run
+dotnet --version
 
 echo "initial dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 echo "================="
 
+# Get CLI Branches for testing
 echo "dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting"
-# run it twice so dotnet cli can expand and decompress without affecting the result of the target
-dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting
 
 DOTNET_BRANCHES="$(dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting)"
 
@@ -64,11 +67,11 @@ do
 	echo "Channel is: $Channel"
 	echo "Version is: $Version"
 	scripts/funcTests/dotnet-install.sh -i cli -c $Channel -v $Version -nopath
-
-	# Display current version
-	$DOTNET --version
-	dotnet --info
 done
+
+# Display current version
+dotnet --version
+dotnet --info
 
 echo "second dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 echo "================="
@@ -95,8 +98,8 @@ echo "git submodules updated finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 # clear caches
 if [ "$CLEAR_CACHE" == "1" ]
 then
-	# echo "Clearing the nuget web cache folder"
-	# rm -rf ~/.local/share/NuGet/*
+	echo "Clearing the nuget web cache folder"
+	rm -rf ~/.local/share/NuGet/*
 
 	echo "Clearing the nuget packages folder"
 	rm -rf ~/.nuget/packages/*

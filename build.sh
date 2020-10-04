@@ -22,10 +22,13 @@ chmod +x cli/dotnet-install.sh
 cli/dotnet-install.sh -i cli -c 1.0
 
 DOTNET="$(pwd)/cli/dotnet"
+echo "Using dotnet cli from '$DOTNET'"
 
+# Let the dotnet cli expand and decompress first if it's a first-run
+$DOTNET --version
+
+# Get CLI Branches for testing
 echo "dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting"
-# run it twice so dotnet cli can expand and decompress without affecting the result of the target
-$DOTNET msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting
 
 DOTNET_BRANCH="$($DOTNET msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting)"
 
@@ -34,6 +37,7 @@ cli/dotnet-install.sh -i cli -c $DOTNET_BRANCH
 
 # Display current version
 $DOTNET --version
+$DOTNET --info
 
 echo "================="
 
@@ -44,8 +48,8 @@ git submodule update
 # clear caches
 if [ "$CLEAR_CACHE" == "1" ]
 then
-	# echo "Clearing the nuget web cache folder"
-	# rm -rf ~/.local/share/NuGet/*
+	echo "Clearing the nuget web cache folder"
+	rm -rf ~/.local/share/NuGet/*
 
 	echo "Clearing the nuget packages folder"
 	rm -rf ~/.nuget/packages/*
