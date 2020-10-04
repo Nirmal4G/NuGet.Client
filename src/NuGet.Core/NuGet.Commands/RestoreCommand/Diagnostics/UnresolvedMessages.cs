@@ -152,7 +152,7 @@ namespace NuGet.Commands
         }
 
         /// <summary>
-        /// True if no stable versions satisfy the range 
+        /// True if no stable versions satisfy the range
         /// but a pre-release version is found.
         /// </summary>
         internal static bool HasPrereleaseVersionsOnly(VersionRange range, IEnumerable<NuGetVersion> versions)

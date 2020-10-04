@@ -701,7 +701,7 @@ namespace NuGet.Protocol
 
                     foreach (var versionDir in idDir.EnumerateDirectories())
                     {
-                        // If we have files in the format {packageId}/{version}/{packageId}.{version}.nupkg, return V3. 
+                        // If we have files in the format {packageId}/{version}/{packageId}.{version}.nupkg, return V3.
                         var package = GetPackageV3(root, idDir.Name, versionDir.Name, log);
 
                         if (package != null)
@@ -741,7 +741,7 @@ namespace NuGet.Protocol
                 rootDirectoryInfo = new DirectoryInfo(localPath);
 
                 // The root must also be parsable as a URI (relative or absolute). This rejects
-                // sources that have the weird "C:Source" format. For more information about this 
+                // sources that have the weird "C:Source" format. For more information about this
                 // format, see:
                 // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx#paths
                 var uriResult = new Uri(root, UriKind.RelativeOrAbsolute);
@@ -1006,7 +1006,7 @@ namespace NuGet.Protocol
 
         /// <summary>
         /// Remove duplicate packages which can occur in directories.
-        /// In V2 packages may exist under multiple sub folders. 
+        /// In V2 packages may exist under multiple sub folders.
         /// Non-normalized versions also lead to duplicates: ex: 1.0, 1.0.0.0
         /// </summary>
         public static IEnumerable<LocalPackageInfo> GetDistinctPackages(IEnumerable<LocalPackageInfo> packages)

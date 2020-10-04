@@ -10,7 +10,7 @@ namespace NuGet.Test
     {
         [Theory]
         // net5.0 and later is not compat with net1.0 through net 4.x.xxx.
-        // users must use those TFMs via AssetTargetFallback, which will be set 
+        // users must use those TFMs via AssetTargetFallback, which will be set
         [InlineData("net5.0", "net452", false)]
         [InlineData("net5.0", "net462", false)]
         [InlineData("net5.0", "net472", false)]

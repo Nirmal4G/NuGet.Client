@@ -201,7 +201,7 @@ namespace NuGet.Commands
                     if (added && IsContentFile(contentMetadata.Target))
                     {
                         var includePath = PathUtility.GetRelativePath("contentFiles" + Path.DirectorySeparatorChar, packageFile.Target, '/');
-                        // This is just a check to see if the filename has already been appended to the target path. 
+                        // This is just a check to see if the filename has already been appended to the target path.
                         // We do this by comparing extensions of the file
                         if (!Path.GetExtension(includePath)
                                 .Equals(Path.GetExtension(sourcePath), StringComparison.OrdinalIgnoreCase))
