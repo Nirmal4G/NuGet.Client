@@ -963,7 +963,7 @@ namespace NuGet.Protocol
 
         private static string EnsurePackageExtension(string packagePath, bool isSnupkg)
         {
-#if NETCOREAPP
+#if IS_CORECLR
             if (packagePath.IndexOf('*', StringComparison.Ordinal) == -1)
 #else
             if (packagePath.IndexOf('*') == -1)

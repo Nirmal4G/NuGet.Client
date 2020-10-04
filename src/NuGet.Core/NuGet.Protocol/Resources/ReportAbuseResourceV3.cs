@@ -33,7 +33,7 @@ namespace NuGet.Protocol
         public Uri GetReportAbuseUrl(string id, NuGetVersion version)
         {
             var uriString = _uriTemplate
-#if NETCOREAPP
+#if IS_CORECLR
                .Replace("{id}", id, StringComparison.OrdinalIgnoreCase)
                .Replace("{version}", version.ToNormalizedString(), StringComparison.OrdinalIgnoreCase);
 #else

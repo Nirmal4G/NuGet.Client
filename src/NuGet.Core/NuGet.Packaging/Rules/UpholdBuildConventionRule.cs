@@ -89,7 +89,7 @@ namespace NuGet.Packaging.Rules
 
         private string GetTfm(string file)
         {
-#if NETCOREAPP
+#if IS_CORECLR
             var index1 = file.IndexOf('/', StringComparison.Ordinal);
             var index2 = file.IndexOf('/', index1 + 1);
 #else
@@ -109,7 +109,7 @@ namespace NuGet.Packaging.Rules
 
         private string GetBuildFolder(string file)
         {
-#if NETCOREAPP
+#if IS_CORECLR
             var index = file.IndexOf('/', StringComparison.Ordinal);
 #else
             var index = file.IndexOf('/');

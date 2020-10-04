@@ -24,7 +24,7 @@ Please follow the [documentation on installing the .NET Core SDK](https://docs.m
       "symbolOptions": {
         "searchPaths": [
           // Change this path to the test project dll path that you want to debug, and add any additional search paths.
-          "${workspaceFolder}/test/NuGet.Core.FuncTests/NuGet.Packaging.FuncTest/bin/Debug/netcoreapp5.0"
+          "${workspaceFolder}/test/NuGet.Core.FuncTests/NuGet.Packaging.FuncTest/bin/Debug/net5.0"
         ]
       }
     }
@@ -41,9 +41,9 @@ Please follow the [documentation on installing the .NET Core SDK](https://docs.m
 1. Launch the test suite in debug mode:
    1. On Windows:
       1. `$env:VSTEST_HOST_DEBUG=1` To set the environment variable.
-      1. `dotnet vstest bin\debug\netcoreapp5.0\My.Test.Project.dll /Tests:<TestFilterHere>`
+      1. `dotnet vstest bin\debug\net5.0\My.Test.Project.dll /Tests:<TestFilterHere>`
    1. On OSX and Linux:
-      1. `VSTEST_HOST_DEBUG=1 dotnet vstest bin/debug/netcoreapp5.0/My.Test.Project.dll /Tests:<TestFilterHere>`
+      1. `VSTEST_HOST_DEBUG=1 dotnet vstest bin/debug/net5.0/My.Test.Project.dll /Tests:<TestFilterHere>`
 1. When the terminal prompts you to attach, go to the debugger tab in VS Code and launch the `.NET Core Attach (Test)` configuration, then enter the PID of the process in the terminal.
 1. Once attached, resume execution _and then disconnect_, letting that part run -- we're not at the actual tests yet.
 1. Once the first process completes, the terminal will prompt you _again_ to attach to a process. Lanch the attach process again and enter the _new_ PID.

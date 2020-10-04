@@ -11,8 +11,9 @@
     <IsCore>true</IsCore>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp5.0' ">
-    <DefineConstants>$(DefineConstants);NETCORE5_0</DefineConstants>
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`.0123456789`))' == 'net' AND $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFramework.TrimStart(`net`))', '5.0'))">
+    <DefineConstants>$(DefineConstants);IS_CORECLR;NET5_0</DefineConstants>
+    <IsCore>true</IsCore>
   </PropertyGroup>
 
   <PropertyGroup>

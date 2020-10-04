@@ -88,7 +88,7 @@ namespace NuGet.Protocol
         {
             var invalid = Path.GetInvalidFileNameChars();
             return new string(
-#if NETCOREAPP
+#if IS_CORECLR
                 value.Select(ch => invalid.Contains(ch) ? '_' : ch).ToArray()
                 )
                 .Replace("__", "_", StringComparison.Ordinal)

@@ -983,7 +983,7 @@ namespace Dotnet.Integration.Test
         [PlatformTheory(Platform.Windows)]
         [InlineData("TargetFramework", "netstandard1.4")]
         [InlineData("TargetFrameworks", "netstandard1.4;net46")]
-#if NETCOREAPP5_0
+#if NET5_0
         [InlineData("TargetFramework", "net5.0")]
         [InlineData("TargetFrameworks", "netstandard1.4;net5.0")]
 #endif
@@ -1075,7 +1075,7 @@ namespace Dotnet.Integration.Test
         [PlatformTheory(Platform.Windows)]
         [InlineData("TargetFramework", "netstandard1.4")]
         [InlineData("TargetFrameworks", "netstandard1.4;net46")]
-#if NETCOREAPP5_0
+#if NET5_0
         [InlineData("TargetFramework", "net5.0")]
         [InlineData("TargetFrameworks", "netstandard1.4;net5.0")]
 #endif
@@ -1154,7 +1154,7 @@ namespace Dotnet.Integration.Test
         [PlatformTheory(Platform.Windows)]
         [InlineData("TargetFramework", "netstandard1.4")]
         [InlineData("TargetFrameworks", "netstandard1.4;net46")]
-#if NETCOREAPP5_0
+#if NET5_0
         [InlineData("TargetFramework", "net5.0")]
         [InlineData("TargetFrameworks", "netstandard1.4;net5.0")]
 #endif
@@ -2014,7 +2014,7 @@ namespace Dotnet.Integration.Test
             }
         }
 
-#if NETCOREAPP5_0
+#if NET5_0
         [PlatformFact(Platform.Windows)]
         public void PackCommand_SingleFramework_GeneratesPackageOnBuildUsingNet5()
         {
@@ -3131,7 +3131,7 @@ namespace ClassLibrary
         [PlatformTheory(Platform.Windows)]
         [InlineData("TargetFramework", "netstandard1.4")]
         [InlineData("TargetFrameworks", "netstandard1.4;net46")]
-#if NETCOREAPP5_0
+#if NET5_0
         [InlineData("TargetFramework", "net5.0")]
         [InlineData("TargetFrameworks", "netstandard1.4;net5.0")]
 #endif
@@ -3176,7 +3176,7 @@ namespace ClassLibrary
         [PlatformTheory(Platform.Windows)]
         [InlineData("TargetFramework", "netstandard1.4")]
         [InlineData("TargetFrameworks", "netstandard1.4;net46")]
-#if NETCOREAPP5_0
+#if NET5_0
         [InlineData("TargetFramework", "net5.0")]
         [InlineData("TargetFrameworks", "netstandard1.4;net5.0")]
 #endif

@@ -826,7 +826,7 @@ namespace NuGet.Commands
                 var fileName = Path.GetFileName(firstItem.Path);
 
                 Debug.Assert(!string.IsNullOrEmpty(fileName));
-#if NETCOREAPP
+#if IS_CORECLR
                 Debug.Assert(firstItem.Path.IndexOf('/', StringComparison.Ordinal) > 0);
 #else
                 Debug.Assert(firstItem.Path.IndexOf('/') > 0);

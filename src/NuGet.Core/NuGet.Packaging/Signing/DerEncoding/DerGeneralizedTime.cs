@@ -32,7 +32,7 @@ namespace NuGet.Packaging.Signing.DerEncoding
                 throw new CryptographicException(SR.Cryptography_Der_Invalid_Encoding);
             }
 
-#if NETCOREAPP
+#if IS_CORECLR
             var decimalIndex = decodedTime.IndexOf('.', StringComparison.Ordinal);
 #else
             var decimalIndex = decodedTime.IndexOf('.');

@@ -87,7 +87,7 @@ namespace NuGet.Protocol.Core.Types
             }
 
             var invalidPathChars = Path.GetInvalidPathChars();
-#if NETCOREAPP
+#if IS_CORECLR
             if (invalidPathChars.Any(p => path.Contains(p, StringComparison.Ordinal)))
 #else
             if (invalidPathChars.Any(p => path.Contains(p)))

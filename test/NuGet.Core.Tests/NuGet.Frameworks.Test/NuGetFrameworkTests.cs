@@ -383,6 +383,7 @@ namespace NuGet.Test
         [Theory]
         [InlineData("netcoreapp5.0")]
         [InlineData("net45")]
+        [InlineData("net5.0")]
         [InlineData("net5.0-windows10.0.16000.1")]
         public void NuGetFramework_WithCopyConstructor_CreatesEquivalentFrameworks(string frameworkName)
         {

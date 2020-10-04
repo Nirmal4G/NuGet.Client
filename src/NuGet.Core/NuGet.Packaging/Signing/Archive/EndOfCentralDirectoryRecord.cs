@@ -107,7 +107,7 @@ namespace NuGet.Packaging.Signing
             throw new InvalidDataException(
                 string.Format(CultureInfo.CurrentCulture,
                 Strings.ErrorByteSignatureNotFound,
-#if NETCOREAPP
+#if IS_CORECLR
                 BitConverter.ToString(signature.ToArray()).Replace("-", "", StringComparison.Ordinal)));
 #else
                 BitConverter.ToString(signature.ToArray()).Replace("-", "")));

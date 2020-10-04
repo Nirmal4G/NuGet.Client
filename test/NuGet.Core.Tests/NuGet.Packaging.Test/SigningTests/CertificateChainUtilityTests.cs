@@ -106,7 +106,7 @@ namespace NuGet.Packaging.Test
                 }
                 else if (RuntimeEnvironmentHelper.IsLinux)
                 {
-#if NETCORE5_0
+#if NET5_0
                     Assert.Equal(2, logger.Warnings);
                     SigningTestUtility.AssertOfflineRevocation(logger.LogMessages, LogLevel.Warning);
 #else
@@ -139,14 +139,14 @@ namespace NuGet.Packaging.Test
                 }
 
                 Assert.Equal(0, logger.Errors);
-#if (IS_DESKTOP || NETCORE5_0)
+#if (IS_DESKTOP || NET5_0)
                 Assert.Equal(1, logger.Warnings);
 #else
                 Assert.Equal(RuntimeEnvironmentHelper.IsLinux ? 2 : 1, logger.Warnings);
 #endif
                 SigningTestUtility.AssertUntrustedRoot(logger.LogMessages, LogLevel.Warning);
 
-#if !NETCORE5_0
+#if !NET5_0
                 if (RuntimeEnvironmentHelper.IsLinux)
                 {
                     SigningTestUtility.AssertRevocationStatusUnknown(logger.LogMessages, LogLevel.Warning);

@@ -846,7 +846,7 @@ namespace NuGet.Protocol.Core.Types
             }
             catch (HttpRequestException ex)
             {
-#if NETCOREAPP
+#if IS_CORECLR
                 if (ex.Message.Contains("Response status code does not indicate success: 403 (Forbidden).", StringComparison.OrdinalIgnoreCase))
 #else
                 if (ex.Message.Contains("Response status code does not indicate success: 403 (Forbidden)."))

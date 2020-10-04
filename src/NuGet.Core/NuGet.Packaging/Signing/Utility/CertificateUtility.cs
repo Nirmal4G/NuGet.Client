@@ -267,7 +267,7 @@ namespace NuGet.Packaging.Signing
             }
 
             var certificateFingerprint = GetHash(certificate, hashAlgorithm);
-#if NETCOREAPP
+#if IS_CORECLR
             return BitConverter.ToString(certificateFingerprint).Replace("-", "", StringComparison.Ordinal);
 #else
             return BitConverter.ToString(certificateFingerprint).Replace("-", "");
@@ -333,7 +333,7 @@ namespace NuGet.Packaging.Signing
                     if (reader.HasTag(keyIdentifierTag))
                     {
                         var keyIdentifier = reader.ReadValue(keyIdentifierTag);
-#if NETCOREAPP
+#if IS_CORECLR
                         var akiKeyIdentifier = BitConverter.ToString(keyIdentifier).Replace("-", "", StringComparison.Ordinal);
 #else
                         var akiKeyIdentifier = BitConverter.ToString(keyIdentifier).Replace("-", "");

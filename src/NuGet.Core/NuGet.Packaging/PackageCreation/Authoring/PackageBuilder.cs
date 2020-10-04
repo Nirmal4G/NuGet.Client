@@ -1070,7 +1070,7 @@ namespace NuGet.Packaging
                         }
                         else
                         {
-#if NETCOREAPP
+#if IS_CORECLR
                             filesWithoutExtensions.Add($"/{file.Path.Replace("\\", "/", StringComparison.Ordinal)}");
 #else
                             filesWithoutExtensions.Add($"/{file.Path.Replace("\\", "/")}");

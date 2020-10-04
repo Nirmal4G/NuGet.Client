@@ -22,6 +22,7 @@ namespace NuGet.Test
         [InlineData("netcoreapp5.0", "netcoreapp5.0", true)]
         [InlineData("net5.0", "netcoreapp5.0", true)]
         [InlineData("netcoreapp6.0", "netcoreapp5.0", true)]
+        [InlineData("net6.0", "net5.0", true)]
 
         // net5.0 is compat with netstandard 1 through 2.1
         [InlineData("net5.0", "netstandard2.2", false)]

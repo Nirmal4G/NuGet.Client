@@ -104,7 +104,7 @@ namespace NuGet.Protocol
 
         private static string GenerateCacheKey(ServiceIndexEntry serviceEntry)
         {
-#if NETCOREAPP
+#if IS_CORECLR
             var index = serviceEntry.Type.IndexOf('/', StringComparison.Ordinal);
 #else
             var index = serviceEntry.Type.IndexOf('/');
