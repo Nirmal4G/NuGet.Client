@@ -41,11 +41,11 @@ scripts/funcTests/dotnet-install.sh -i cli -c 2.2 -NoPath
 DOTNET="$(pwd)/cli/dotnet"
 
 
-echo "dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting"
+echo "dotnet msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting"
 # run it twice so dotnet cli can expand and decompress without affecting the result of the target
-dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting
-DOTNET_BRANCHES="$(dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting)"
-echo $DOTNET_BRANCHES | tr ";" "\n" |  while read -r DOTNET_BRANCH
+dotnet msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting
+DOTNET_BRANCHES="$(dotnet msbuild build/config.props /noAutoRsp /v:m /nologo /t:GetCliBranchForTesting)"
+echo $DOTNET_BRANCHES | tr ";" "\n" | while read -r DOTNET_BRANCH
 do
 	echo $DOTNET_BRANCH
 	ChannelAndVersion=($DOTNET_BRANCH)

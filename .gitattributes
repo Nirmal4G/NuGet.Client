@@ -63,6 +63,9 @@ project.json text
 *.vcxitems text eol=crlf
 *.vcxproj text eol=crlf
 
+# Unix artifacts
+*.sh text eol=lf
+
 # Denote all files that are truly binary and should not be modified.
 *.jpg  	binary
 *.png 	binary

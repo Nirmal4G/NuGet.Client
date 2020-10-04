@@ -26,15 +26,10 @@ mkdir -p $installDir
 curl -o $installDir/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 
 # Run install.sh for cli
-
 chmod +x $installDir/dotnet-install.sh
 
-
-# install master channel to get latest .NET 5 sdks 
-
-# Issue 8936 - DISABLED TEMPORARILY $installDir/dotnet-install.sh -i $installDir -c $Channel -v $Version
-chmod +x scripts/funcTests/dotnet-install.sh
-scripts/funcTests/dotnet-install.sh -i $installDir -c $Channel -v $Version 
+# install master channel to get latest .NET 5 sdks
+$installDir/dotnet-install.sh -i $installDir -c $Channel -v $Version
 
 echo "Add ${installDir} to PATH"
 PATH=$PATH:${installDir}
@@ -52,4 +47,3 @@ dotnet --info
 
 
 echo "================="
-
