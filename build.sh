@@ -15,11 +15,21 @@ echo "Installing dotnet CLI"
 mkdir -p cli
 curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 
+if [ $? -ne 0 ]; then
+	echo "Could not download 'dotnet-install.sh' script. Please check your network and try again!"
+	exit 1
+fi
+
 # Run install.sh for cli
 chmod +x cli/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
 cli/dotnet-install.sh -i cli -c 1.0
+
+if [ $? -ne 0 ]; then
+	echo ".NET CLI Install failed!!"
+	exit 1
+fi
 
 DOTNET="$(pwd)/cli/dotnet"
 echo "Using dotnet cli from '$DOTNET'"

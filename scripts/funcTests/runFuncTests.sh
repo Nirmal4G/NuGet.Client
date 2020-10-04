@@ -67,6 +67,10 @@ do
 	echo "Channel is: $Channel"
 	echo "Version is: $Version"
 	scripts/funcTests/dotnet-install.sh -i cli -c $Channel -v $Version -nopath
+
+	if [ $? -ne 0 ]; then
+		echo ".NET CLI Install for '$DOTNET_BRANCH' failed!!"
+	fi
 done
 
 # Display current version
