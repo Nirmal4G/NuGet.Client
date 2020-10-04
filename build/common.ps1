@@ -153,22 +153,24 @@ Function Install-DotnetCLI {
     param(
         [switch]$Force
     )
+    Trace-Log "The .NET SDK will be installed in : $CLIRoot"
 
     $VSMajorVersion = Get-VSMajorVersion
     $MSBuildExe = Get-MSBuildExe $VSMajorVersion
-
-    $CliBranchListForTesting = & $msbuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting
-    $CliBranchList = $CliBranchListForTesting.Trim() -split ';'
-
     $DotNetExe = Join-Path $CLIRoot 'dotnet.exe'
     $DotNetInstall = Join-Path $CLIRoot 'dotnet-install.ps1'
 
     # If "-force" is specified, or dotnet.exe under cli folder doesn't exist, create cli folder and download dotnet-install.ps1 into cli folder.
     if ($Force -or -not (Test-Path $DotNetExe)) {
-        Trace-Log "Downloading .NET CLI '$CliBranchList'"
+        Trace-Log "Downloading .NET SDK Install Script"
         New-Item -ItemType Directory -Force -Path $CLIRoot | Out-Null
         Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -UseBasicParsing -OutFile $DotNetInstall
     }
+
+    $CliBranchListForTesting = & $MSBuildExe $NuGetClientRoot\build\config.props /v:m /nologo /t:GetCliBranchForTesting
+    $CliBranchList = $CliBranchListForTesting.Trim() -split ';'
+
+    Trace-Log "Install .NET SDK for '$CliBranchList'"
 
     ForEach ($CliBranch in $CliBranchList) {
         $CliBranch = $CliBranch.Trim()
@@ -181,6 +183,8 @@ Function Install-DotnetCLI {
         else {
             $Version = $CliChannelAndVersion[1].Trim()
         }
+
+        Trace-Log  "Channel: $Channel       Version: $Version"
 
         if ($Version -eq 'latest') {
 
@@ -220,6 +224,7 @@ Function Install-DotnetCLI {
 
         # If "-force" is specified, or folder with specific version doesn't exist, the download command will run
         if ($Force -or -not (Test-Path $DotNetSdkPath)) {
+            # Install the latest .NET SDK from the specified channel/version
             Trace-Log "$DotNetInstall -Channel $Channel -Version $Version -NoPath"
             & $DotNetInstall -i $CLIRoot -Channel $Channel -Version $Version -NoPath
         }
