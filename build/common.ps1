@@ -192,26 +192,39 @@ Function Install-DotnetCLI {
             # Get the latest specific version number for a certain channel from url like : https://dotnetcli.blob.core.windows.net/dotnet/Sdk/release/5.0.1xx/latest.version
             $latestVersionLink = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$Channel/latest.version"
 
-            $latestVersionFile = Invoke-RestMethod -UseBasicParsing -Uri $latestVersionLink
-            $stringReader = [System.IO.StringReader]::new($latestVersionFile)
-            [int]$count = 0
-            while ($line = $stringReader.ReadLine()) {
-                if ($count -eq 1) {
-                    $expectedVersion = $line.Trim()
+            try {
+                $latestVersionFile = Invoke-RestMethod -UseBasicParsing -Uri $latestVersionLink
+                $stringReader = [System.IO.StringReader]::new($latestVersionFile)
+                [int]$count = 0
+                while ($line = $stringReader.ReadLine()) {
+                    if ($count -eq 1) {
+                        $specificVersion = $line.Trim()
+                    }
+                    $count += 1
                 }
-                $count += 1
+            }
+            catch {
+                throw
+                exit
             }
 
-            $productVersionLink = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$expectedVersion/productVersion.txt"
+            # The 'productVersion.txt' for some .NET versions is missing (e.g. nightly versions and versions older than v5).
+            # Work around this by providing a warning. See related issue: https://github.com/dotnet/install-scripts/issues/153
+            $productVersionLink = "https://dotnetcli.blob.core.windows.net/dotnet/Sdk/$specificVersion/productVersion.txt"
 
-            $productVersionFile = Invoke-RestMethod -UseBasicParsing -Uri $productVersionLink
-            $stringReader = [System.IO.StringReader]::new($productVersionFile)
-            [int]$count = 0
-            while ($line = $stringReader.ReadLine()) {
-                if ($count -eq 1) {
-                    $specificVersion = $line.Trim()
+            try {
+                $productVersionFile = Invoke-RestMethod -UseBasicParsing -Uri $productVersionLink
+                $stringReader = [System.IO.StringReader]::new($productVersionFile)
+                [int]$count = 0
+                while ($line = $stringReader.ReadLine()) {
+                    if ($count -eq 1) {
+                        $specificVersion = $line.Trim()
+                    }
+                    $count += 1
                 }
-                $count += 1
+            }
+            catch {
+                Warning-Log "The '$specificVersion' version cannot be verified to be present in the $Channel channel. Meaning the version may or may not exist."
             }
         }
         else {
