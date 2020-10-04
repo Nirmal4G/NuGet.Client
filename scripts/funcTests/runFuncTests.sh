@@ -18,6 +18,7 @@ RESULTCODE=0
 echo "==================================================================================================="
 openssl version -a
 echo "==================================================================================================="
+
 # move up to the repo root
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DIR=$SCRIPTDIR/../..
@@ -40,12 +41,16 @@ scripts/funcTests/dotnet-install.sh -i cli -c 2.2 -NoPath
 
 DOTNET="$(pwd)/cli/dotnet"
 
+echo "initial dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
+echo "================="
 
-echo "dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting"
+echo "dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting"
 # run it twice so dotnet cli can expand and decompress without affecting the result of the target
-dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting
-DOTNET_BRANCHES="$(dotnet msbuild build/config.props /v:m /nologo /t:GetCliBranchForTesting)"
-echo $DOTNET_BRANCHES | tr ";" "\n" |  while read -r DOTNET_BRANCH
+dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting
+
+DOTNET_BRANCHES="$(dotnet msbuild build/config.props -v:m -nologo -t:GetCliBranchForTesting)"
+
+echo $DOTNET_BRANCHES | tr ";" "\n" | while read -r DOTNET_BRANCH
 do
 	echo $DOTNET_BRANCH
 	ChannelAndVersion=($DOTNET_BRANCH)
@@ -65,27 +70,23 @@ do
 	dotnet --info
 done
 
-echo "initial dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
-
-echo "================="
-
-echo "Deleting .NET Core temporary files"
-rm -rf "/tmp/"dotnet.*
-
 echo "second dotnet cli install finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 echo "================="
 
+echo "Deleting .NET Core temporary files"
+rm -rf /tmp/dotnet.*
+
 #restore solution packages
-dotnet msbuild -t:restore "$DIR/build/bootstrap.proj"
+dotnet msbuild -t:Restore build/bootstrap.proj
+
 if [ $? -ne 0 ]; then
-	echo "Restore failed!!"
+	echo "Bootstrap project restore failed!!"
 	exit 1
 fi
 
 echo "bootstrap project restore finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 # init the repo
-
 git submodule init
 git submodule update
 
@@ -95,15 +96,16 @@ echo "git submodules updated finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 if [ "$CLEAR_CACHE" == "1" ]
 then
 	# echo "Clearing the nuget web cache folder"
-	# rm -r -f ~/.local/share/NuGet/*
+	# rm -rf ~/.local/share/NuGet/*
 
 	echo "Clearing the nuget packages folder"
-	rm -r -f ~/.nuget/packages/*
+	rm -rf ~/.nuget/packages/*
 fi
 
 # restore packages
-echo "dotnet msbuild build/build.proj /t:Restore /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
-dotnet msbuild build/build.proj /t:Restore /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta
+echo "dotnet msbuild build/build.proj -t:Restore -p:VisualStudioVersion=16.0 -p:Configuration=Release -p:BuildNumber=1 -p:ReleaseLabel=beta"
+dotnet msbuild build/build.proj -t:Restore -p:VisualStudioVersion=16.0 -p:Configuration=Release -p:BuildNumber=1 -p:ReleaseLabel=beta
+
 if [ $? -ne 0 ]; then
 	echo "Restore failed!!"
 	exit 1
@@ -112,8 +114,8 @@ fi
 echo "Restore finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 # Unit tests
-echo "dotnet msbuild build/build.proj /t:CoreUnitTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
-dotnet msbuild build/build.proj /t:CoreUnitTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta
+echo "dotnet msbuild build/build.proj -t:CoreUnitTests -p:VisualStudioVersion=16.0 -p:Configuration=Release -p:BuildNumber=1 -p:ReleaseLabel=beta"
+dotnet msbuild build/build.proj -t:CoreUnitTests -p:VisualStudioVersion=16.0 -p:Configuration=Release -p:BuildNumber=1 -p:ReleaseLabel=beta
 
 if [ $? -ne 0 ]; then
 	echo "CoreUnitTests failed!!"
@@ -131,11 +133,11 @@ else
 	echo "$DIR/$RESULTFILE not found."
 fi
 
-echo "Core tests finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
+echo "CoreUnitTests finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
 
 # Func tests
-echo "dotnet msbuild build/build.proj /t:CoreFuncTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta"
-dotnet msbuild build/build.proj /t:CoreFuncTests /p:VisualStudioVersion=16.0 /p:Configuration=Release /p:BuildNumber=1 /p:ReleaseLabel=beta
+echo "dotnet msbuild build/build.proj -t:CoreFuncTests -p:VisualStudioVersion=16.0 -p:Configuration=Release -p:BuildNumber=1 -p:ReleaseLabel=beta"
+dotnet msbuild build/build.proj -t:CoreFuncTests -p:VisualStudioVersion=16.0 -p:Configuration=Release -p:BuildNumber=1 -p:ReleaseLabel=beta
 
 if [ $? -ne 0 ]; then
 	RESULTCODE='1'
@@ -151,19 +153,21 @@ else
 	echo "$DIR/$RESULTFILE not found."
 fi
 
+echo "CoreFuncTests finished at `date -u +"%Y-%m-%dT%H:%M:%S"`"
+
 if [ -z "$CI" ]; then
 	popd
 	exit $RESULTCODE
 fi
 
-#run mono test
+# Run mono test
 TestDir="$DIR/artifacts/NuGet.CommandLine.Test/"
 XunitConsole="$DIR/packages/xunit.runner.console/2.4.1/tools/net472/xunit.console.exe"
 
-#Clean System dll
+# Clean System dll
 rm -rf "$TestDir/System.*" "$TestDir/WindowsBase.dll" "$TestDir/Microsoft.CSharp.dll" "$TestDir/Microsoft.Build.Engine.dll"
 
-#Run xunit test
+# Run xunit test
 
 case "$(uname -s)" in
 		Linux)
@@ -172,7 +176,7 @@ case "$(uname -s)" in
 			#mono $XunitConsole "$TestDir/NuGet.CommandLine.Test.dll" -notrait Platform=Windows -notrait Platform=Darwin -xml "build/TestResults/monoonlinux.xml" -verbose
 			if [ $RESULTCODE -ne '0' ]; then
 				RESULTCODE=$?
-				echo "Unit Tests or Core Func Tests failed on Linux"
+				echo "Mono Tests failed on Linux"
 				exit 1
 			fi
 			;;
@@ -181,7 +185,7 @@ case "$(uname -s)" in
 			mono $XunitConsole "$TestDir/NuGet.CommandLine.Test.dll" -notrait Platform=Windows -notrait Platform=Linux -xml "build/TestResults/monoonmac.xml" -verbose
 			if [ $? -ne '0' ]; then
 				RESULTCODE=$?
-				echo "Mono tests failed!"
+				echo "Mono Tests failed on Mac"
 				exit 1
 			fi
 			;;
