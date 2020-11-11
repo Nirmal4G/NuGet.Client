@@ -29,15 +29,13 @@ mono --version
 # Download the CLI install script to cli
 echo "Installing dotnet CLI"
 mkdir -p cli
-# Issue 8936 - DISABLED TEMPORARILY curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
+curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 
 # Run install.sh
-# Issue 8936 chmod +x cli/dotnet-install.sh
-chmod +x scripts/funcTests/dotnet-install.sh
+chmod +x cli/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
-# Issue 8936 - DISABLED TEMPORARILY cli/dotnet-install.sh -i cli -c 2.2
-scripts/funcTests/dotnet-install.sh -i cli -c 2.2
+cli/dotnet-install.sh -i cli -c 2.2
 
 # Check where the dotnet is run from
 which dotnet
@@ -75,7 +73,7 @@ do
 
 	echo "Channel is: $Channel"
 	echo "Version is: $Version"
-	scripts/funcTests/dotnet-install.sh -i cli -c $Channel -v $Version -nopath
+	cli/dotnet-install.sh -i cli -c $Channel -v $Version -nopath
 
 	if [ $? -ne 0 ]; then
 		echo ".NET CLI Install for '$DOTNET_BRANCH' failed!!"
