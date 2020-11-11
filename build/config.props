@@ -39,7 +39,7 @@
         If a version is not specified, the latest version from the channel will be downloaded.
       Note that multiple SDK tags can be specified by using `;` as a separator. Those will be downloaded as well.
     -->
-    <CliBranchForTesting Condition="'$(CliBranchForTesting)' == ''">release/5.0.2xx:5.0.200-servicing.21120.4</CliBranchForTesting>
+    <CliBranchForTesting Condition="'$(CliBranchForTesting)' == ''">release/5.0.2xx:5.0.200</CliBranchForTesting>
   </PropertyGroup>
 
   <!-- Config -->
