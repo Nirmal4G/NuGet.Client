@@ -252,11 +252,11 @@ Function Install-DotnetCLI {
         Error-Log "Unable to find dotnet.exe. The CLI install may have failed." -Fatal
     }
 
-    # Install the 2.2 runtime because our tests targets 2.1 runtime. The 2.2 runtime covers wide range of 2.x behaviors, including roll forward capability.
-    Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.2 -NoPath"
+    # Install the 2.1 runtime because our tests targets 2.1 runtime.
+    Trace-Log "$DotNetInstall -Runtime dotnet -Channel 2.1 -NoPath"
     # Work around the following install script bug https://github.com/dotnet/install-scripts/issues/152
     # Start a new process to avoid the 'ErrorVariable' getting populated.
-    & powershell $DotNetInstall -i $CLIRoot -Runtime dotnet -Channel 2.2 -NoPath
+    & powershell $DotNetInstall -i $CLIRoot -Runtime dotnet -Channel 2.1 -NoPath
 
     # Display build info
     & $DotNetExe --info

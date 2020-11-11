@@ -35,7 +35,7 @@ curl -o cli/dotnet-install.sh -L https://dot.net/v1/dotnet-install.sh
 chmod +x cli/dotnet-install.sh
 
 # Get recommended version for bootstrapping testing version
-cli/dotnet-install.sh -i cli -c 2.2
+cli/dotnet-install.sh -i cli -c 5.0
 
 # Check where the dotnet is run from
 which dotnet
@@ -79,6 +79,9 @@ do
 		echo ".NET CLI Install for '$DOTNET_BRANCH' failed!!"
 	fi
 done
+
+# Install the 2.1 runtime because our tests target netcoreapp2.1
+cli/dotnet-install.sh -i cli --runtime dotnet -c 2.1
 
 # Display current version
 dotnet --version
